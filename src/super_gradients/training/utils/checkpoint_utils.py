@@ -183,7 +183,7 @@ def read_ckpt_state_dict(ckpt_path: str, device="cpu") -> Mapping[str, torch.Ten
         if not os.path.exists(ckpt_path):
             raise FileNotFoundError(f"Incorrect Checkpoint path: {ckpt_path} (This should be an absolute path)")
 
-        state_dict = torch.load(ckpt_path, map_location=device)
+        state_dict = torch.load(ckpt_path, map_location=device, weights_only=False)
         return state_dict
 
 
@@ -1609,7 +1609,7 @@ def load_pretrained_weights_local(model: torch.nn.Module, architecture: str, pre
 
     map_location = torch.device("cpu")
 
-    pretrained_state_dict = torch.load(pretrained_weights, map_location=map_location)
+    pretrained_state_dict = torch.load(pretrained_weights, map_location=map_location, weights_only=True)
     _load_weights(architecture, model, pretrained_state_dict)
     _maybe_load_preprocessing_params(model, pretrained_state_dict)
 

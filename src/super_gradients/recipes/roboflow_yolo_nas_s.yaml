@@ -36,7 +36,7 @@ arch_params:
 
 load_checkpoint: False
 checkpoint_params:
-  pretrained_weights: coco
+  pretrained_weights: null
 
 
 result_path: # By defaults saves results in checkpoints directory
