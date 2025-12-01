@@ -129,4 +129,4 @@ class ModelWeightAveraging:
         return False, None
 
     def _get_averaging_snapshots_dict(self):
-        return torch.load(self.averaging_snapshots_file, map_location="cpu")
+        return torch.load(self.averaging_snapshots_file, map_location="cpu", weights_only=False)
