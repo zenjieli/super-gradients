@@ -1,0 +1,83 @@
+# person_detection_data (YOLO-format, single class). Transforms copied from coco_detection_yolo_nas_dataset_params.yaml.
+class_names: [person]
+
+train_dataset_params:
+  data_dir: ${oc.env:HOME}/data/person_detection_data
+  images_dir: train
+  labels_dir: train
+  classes: ${dataset_params.class_names}
+  input_dim: [640, 640]
+  cache_annotations: True
+  ignore_empty_annotations: False # 753 person-free images are useful negatives
+  transforms:
+    - DetectionRandomAffine:
+        degrees: 0                    # rotation degrees, randomly sampled from [-degrees, degrees]
+        translate: 0.25               # image translation fraction
+        scales: [ 0.5, 1.5 ]          # random rescale range (keeps size by padding/cropping) after mosaic transform.
+        shear: 0.0                    # shear degrees, randomly sampled from [-degrees, degrees]
+        target_size:
+        filter_box_candidates: True   # whether to filter out transformed bboxes by edge size, area ratio, and aspect ratio.
+        wh_thr: 2                     # edge size threshold when filter_box_candidates = True (pixels)
+        area_thr: 0.1                 # threshold for area ratio between original image and the transformed one, when when filter_box_candidates = True
+        ar_thr: 20                    # aspect ratio threshold when filter_box_candidates = True
+    - DetectionRGB2BGR:
+        prob: 0.5
+    - DetectionHSV:
+        prob: 0.5                       # probability to apply HSV transform
+        hgain: 18                       # HSV transform hue gain (randomly sampled from [-hgain, hgain])
+        sgain: 30                       # HSV transform saturation gain (randomly sampled from [-sgain, sgain])
+        vgain: 30                       # HSV transform value gain (randomly sampled from [-vgain, vgain])
+    - DetectionHorizontalFlip:
+        prob: 0.5                       # probability to apply horizontal flip
+    - DetectionMixup:
+        input_dim:
+        mixup_scale: [ 0.5, 1.5 ]         # random rescale range for the additional sample in mixup
+        prob: 0.5                       # probability to apply per-sample mixup
+        flip_prob: 0.5                  # probability to apply horizontal flip
+    - DetectionPaddedRescale:
+        input_dim: ${dataset_params.train_dataset_params.input_dim}
+        pad_value: 114
+    - DetectionStandardize:
+        max_value: 255.
+    - DetectionTargetsFormatTransform:
+        output_format: LABEL_CXCYWH
+
+
+train_dataloader_params:
+  batch_size: 25
+  num_workers: 8
+  shuffle: True
+  drop_last: True
+  pin_memory: True
+  collate_fn: DetectionCollateFN
+
+val_dataset_params:
+  data_dir: ${oc.env:HOME}/data/person_detection_data
+  images_dir: val
+  labels_dir: val
+  classes: ${dataset_params.class_names}
+  input_dim: [636, 636]
+  cache_annotations: True
+  ignore_empty_annotations: False
+  transforms:
+    - DetectionRGB2BGR:
+        prob: 1
+    - DetectionPadToSize:
+        output_size: [640, 640]
+        pad_value: 114
+    - DetectionStandardize:
+        max_value: 255.
+    - DetectionImagePermute
+    - DetectionTargetsFormatTransform:
+        input_dim: [640, 640]
+        output_format: LABEL_CXCYWH
+
+val_dataloader_params:
+  batch_size: 25
+  num_workers: 8
+  drop_last: False
+  shuffle: False
+  pin_memory: True
+  collate_fn: DetectionCollateFN
+
+_convert_: all

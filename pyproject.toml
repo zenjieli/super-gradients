@@ -1,3 +1,31 @@
+## uv environment. Dependencies stay in requirements.txt (read by setup.py); torch is pinned below.
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "super-gradients"
+requires-python = "==3.11.*"  # onnx==1.15.0 has no wheels for 3.12+, latest onnxruntime none for 3.10
+dynamic = ["version", "description", "readme", "authors", "urls", "keywords", "dependencies", "optional-dependencies"]
+
+[dependency-groups]
+torch = ["torch==2.9.0", "torchvision==0.24.0"]
+
+[tool.uv]
+default-groups = ["torch"]
+conflicts = [[{ extra = "pro" }, { group = "torch" }]]  # deci-platform-client pins typing-extensions<4.9, torch 2.9 needs >=4.10
+constraint-dependencies = ["numpy<2", "onnxsim<0.5"]  # onnx==1.15.0 is built against numpy 1.x; onnxsim>=0.5 imports undeclared ml_dtypes
+cache-keys = [{ file = "pyproject.toml" }, { file = "setup.py" }, { file = "requirements.txt" }]  # deps are read dynamically by setup.py
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+torchvision = { index = "pytorch-cu128" }
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
 ## Super-Gradients configuration for black/mypy/isort etc tools.
 [tool.isort]
 profile = "black"

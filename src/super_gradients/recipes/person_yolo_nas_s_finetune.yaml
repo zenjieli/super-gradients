@@ -1,0 +1,18 @@
+# person_yolo_nas_s.yaml, but initialised from our own from-scratch COCO2017 YoloNAS-S (80 classes, Jan 2026, 0.356 COCO mAP)
+# instead of random weights. The 80-class head is replaced by a 1-class head (checkpoint_num_classes).
+#
+#   uv run python src/super_gradients/train_from_recipe.py --config-name=person_yolo_nas_s_finetune
+
+defaults:
+  - person_yolo_nas_s
+  - _self_
+
+checkpoint_params:
+  checkpoint_path: ${oc.env:HOME}/workspace/mine/MapNavigation/output/coco/coco2017_yolo_nas_s/RUN_20260116_160401_243410/average_model.pth
+  checkpoint_num_classes: 80
+
+training_hyperparams:
+  max_epochs: 100 # cosine LR decays over these; stop early if val mAP levels off
+  save_ckpt_epoch_list: [25, 50, 75]
+
+experiment_name: person_${architecture}_finetune${experiment_suffix}

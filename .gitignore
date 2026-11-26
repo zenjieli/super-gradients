@@ -190,3 +190,6 @@ cython_debug/
 .idea
 docs/.doctrees
 # End of https://www.toptal.com/developers/gitignore/api/linux,macos,python
+
+# Training outputs (SG experiment dirs); checkpoints/__init__.py stays tracked
+checkpoints/*/
